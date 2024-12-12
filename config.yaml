@@ -1,0 +1,10 @@
+app:
+  name: "SGCU borrowing system service"
+  port: 8000
+  prefork: true
+db:
+  host: "localhost"
+  port: 3306
+  username: "root"
+  password: ""
+  database: "sgcu"
