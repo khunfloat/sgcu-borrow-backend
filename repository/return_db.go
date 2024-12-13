@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	repository "github.com/khunfloat/sgcu-borrow-backend/repository/model"
+	modelRepo "github.com/khunfloat/sgcu-borrow-backend/model/repository"
 	"gorm.io/gorm"
 )
 
@@ -14,13 +14,13 @@ type returnRepositoryDB struct {
 }
 
 func NewReturnRepositoryDB(db *gorm.DB) returnRepositoryDB {
-	db.AutoMigrate(repository.Return{})
+	db.AutoMigrate(modelRepo.Return{})
 	return returnRepositoryDB{db: db}
 }
 
-func (r returnRepositoryDB) GetAll() ([]repository.Return, error) {
+func (r returnRepositoryDB) GetAll() ([]modelRepo.Return, error) {
 
-	returnItems := []repository.Return{}
+	returnItems := []modelRepo.Return{}
 
 	// query
 	tx := r.db.Find(&returnItems)
@@ -31,14 +31,14 @@ func (r returnRepositoryDB) GetAll() ([]repository.Return, error) {
 	return returnItems, nil
 }
 
-func (r returnRepositoryDB) GetById(id string) (*repository.Return, error) {
+func (r returnRepositoryDB) GetById(id string) (*modelRepo.Return, error) {
 
 	returnItemId, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
 	}
 
-	returnItem := repository.Return{}
+	returnItem := modelRepo.Return{}
 	tx := r.db.First(&returnItem, returnItemId)
 	if tx.Error != nil {
 		return nil, tx.Error
@@ -46,7 +46,7 @@ func (r returnRepositoryDB) GetById(id string) (*repository.Return, error) {
 	return &returnItem, nil
 }
 
-func (r returnRepositoryDB) Create(orderId string, itemId string, amount int) (*repository.Return, error) {
+func (r returnRepositoryDB) Create(orderId string, itemId string, amount int) (*modelRepo.Return, error) {
 
 	orderIdInt, err := strconv.Atoi(orderId)
 	if err != nil {
@@ -58,7 +58,7 @@ func (r returnRepositoryDB) Create(orderId string, itemId string, amount int) (*
 		return nil, err
 	}
 
-	returnItem := repository.Return{
+	returnItem := modelRepo.Return{
 		OrderId: orderIdInt,
 		ItemId: itemIdInt,
 		Amount: amount,
@@ -72,7 +72,7 @@ func (r returnRepositoryDB) Create(orderId string, itemId string, amount int) (*
 	return &returnItem, nil
 }
 
-func (r returnRepositoryDB) Update(id string, orderId string, itemId string, amount int, dropoffDatetime time.Time) (*repository.Return, error) {
+func (r returnRepositoryDB) Update(id string, orderId string, itemId string, amount int, dropoffDatetime time.Time) (*modelRepo.Return, error) {
 
 	orderIdInt, err := strconv.Atoi(orderId)
 	if err != nil {
@@ -90,7 +90,7 @@ func (r returnRepositoryDB) Update(id string, orderId string, itemId string, amo
 	}
 
 	// Get data
-	returnItem := repository.Return{}
+	returnItem := modelRepo.Return{}
 	tx := r.db.First(&returnItem, returnItemId)
 	if tx.Error != nil {
 		return nil, tx.Error
@@ -117,7 +117,7 @@ func (r returnRepositoryDB) DeleteById(id string) (error) {
 		return err
 	}
 
-	returnItem := repository.Borrow{}
+	returnItem := modelRepo.Borrow{}
 	tx := r.db.Delete(&returnItem, returnId)
 	if tx.Error != nil {
 		return tx.Error

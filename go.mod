@@ -4,8 +4,10 @@ go 1.23.2
 
 require (
 	github.com/gofiber/fiber/v2 v2.52.5
+	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/spf13/viper v1.19.0
 	go.uber.org/zap v1.27.0
+	golang.org/x/crypto v0.21.0
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gorm v1.25.12
 )

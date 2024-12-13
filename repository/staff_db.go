@@ -1,7 +1,7 @@
 package repository
 
 import (
-	repository "github.com/khunfloat/sgcu-borrow-backend/repository/model"
+	modelRepo "github.com/khunfloat/sgcu-borrow-backend/model/repository"
 	"gorm.io/gorm"
 )
 
@@ -10,13 +10,13 @@ type staffRepositoryDB struct {
 }
 
 func NewStaffRepositoryDB(db *gorm.DB) staffRepositoryDB {
-	db.AutoMigrate(repository.Staff{})
+	db.AutoMigrate(modelRepo.Staff{})
 	return staffRepositoryDB{db: db}
 }
 
-func (r staffRepositoryDB) GetAll() ([]repository.Staff, error) {
+func (r staffRepositoryDB) GetAll() ([]modelRepo.Staff, error) {
 
-	staffs := []repository.Staff{}
+	staffs := []modelRepo.Staff{}
 	
 	// query
 	tx := r.db.Find(&staffs)
@@ -27,9 +27,9 @@ func (r staffRepositoryDB) GetAll() ([]repository.Staff, error) {
 	return staffs, nil
 }
 
-func (r staffRepositoryDB) GetById(id string) (*repository.Staff, error) {
+func (r staffRepositoryDB) GetById(id string) (*modelRepo.Staff, error) {
 
-	staff := repository.Staff{}
+	staff := modelRepo.Staff{}
 	tx := r.db.First(&staff, id)
 	if tx.Error != nil {
 		return nil, tx.Error
@@ -37,9 +37,9 @@ func (r staffRepositoryDB) GetById(id string) (*repository.Staff, error) {
 	return &staff, nil
 }
 
-func (r staffRepositoryDB) Create(id string, name string, password string) (*repository.Staff, error) {
+func (r staffRepositoryDB) Create(id string, name string, password string) (*modelRepo.Staff, error) {
 
-	staff := repository.Staff{
+	staff := modelRepo.Staff{
 		ID: id,
 		Name: name,
 		Password: password,
@@ -53,10 +53,10 @@ func (r staffRepositoryDB) Create(id string, name string, password string) (*rep
 	return &staff, nil
 }
 
-func (r staffRepositoryDB) Update(id string, name string, password string) (*repository.Staff, error) {
+func (r staffRepositoryDB) Update(id string, name string, password string) (*modelRepo.Staff, error) {
 
 	// Get data
-	staff := repository.Staff{}
+	staff := modelRepo.Staff{}
 	tx := r.db.First(&staff, id)
 	if tx.Error != nil {
 		return nil, tx.Error

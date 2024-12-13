@@ -1,4 +1,4 @@
-package repository
+package model
 
 type Staff struct {
 	ID       string `gorm:"primaryKey;size:10;not null"`

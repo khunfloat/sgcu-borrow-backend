@@ -3,7 +3,7 @@ package repository
 import (
 	"strconv"
 
-	repository "github.com/khunfloat/sgcu-borrow-backend/repository/model"
+	modelRepo "github.com/khunfloat/sgcu-borrow-backend/model/repository"
 	"gorm.io/gorm"
 )
 
@@ -12,13 +12,13 @@ type itemRepositoryDB struct {
 }
 
 func NewItemRepositoryDB(db *gorm.DB) itemRepositoryDB {
-	db.AutoMigrate(repository.Item{})
+	db.AutoMigrate(modelRepo.Item{})
 	return itemRepositoryDB{db: db}
 }
 
-func (r itemRepositoryDB) GetAll() ([]repository.Item, error) {
+func (r itemRepositoryDB) GetAll() ([]modelRepo.Item, error) {
 
-	items := []repository.Item{}
+	items := []modelRepo.Item{}
 	
 	// query
 	tx := r.db.Find(&items)
@@ -29,14 +29,14 @@ func (r itemRepositoryDB) GetAll() ([]repository.Item, error) {
 	return items, nil
 }
 
-func (r itemRepositoryDB) GetById(id string) (*repository.Item, error) {
+func (r itemRepositoryDB) GetById(id string) (*modelRepo.Item, error) {
 
 	itemId, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
 	}
 
-	item := repository.Item{}
+	item := modelRepo.Item{}
 	tx := r.db.First(&item, itemId)
 	if tx.Error != nil {
 		return nil, tx.Error
@@ -45,9 +45,9 @@ func (r itemRepositoryDB) GetById(id string) (*repository.Item, error) {
 	return &item, nil
 }
 
-func (r itemRepositoryDB) Create(name string, currentAmount int, imgUrl string) (*repository.Item, error) {
+func (r itemRepositoryDB) Create(name string, currentAmount int, imgUrl string) (*modelRepo.Item, error) {
 
-	item := repository.Item{
+	item := modelRepo.Item{
 		Name: name,
 		CurrentAmount: currentAmount,
 		ImgUrl: imgUrl,
@@ -61,7 +61,7 @@ func (r itemRepositoryDB) Create(name string, currentAmount int, imgUrl string) 
 	return &item, nil
 }
 
-func (r itemRepositoryDB) Update(id string, name string, currentAmount int, imgUrl string, borrowCount int) (*repository.Item, error) {
+func (r itemRepositoryDB) Update(id string, name string, currentAmount int, imgUrl string, borrowCount int) (*modelRepo.Item, error) {
 
 	itemId, err := strconv.Atoi(id)
 	if err != nil {
@@ -69,7 +69,7 @@ func (r itemRepositoryDB) Update(id string, name string, currentAmount int, imgU
 	}
 
 	// Get data
-	item := repository.Item{}
+	item := modelRepo.Item{}
 	tx := r.db.First(&item, itemId)
 	if tx.Error != nil {
 		return nil, tx.Error

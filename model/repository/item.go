@@ -1,4 +1,4 @@
-package repository
+package model
 
 type Item struct {
 	ID            int    `gorm:"primaryKey;autoIncrement;not null"`

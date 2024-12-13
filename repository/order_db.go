@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	repository "github.com/khunfloat/sgcu-borrow-backend/repository/model"
+	modelRepo "github.com/khunfloat/sgcu-borrow-backend/model/repository"
 	"gorm.io/gorm"
 )
 
@@ -14,13 +14,13 @@ type orderRepositoryDB struct {
 }
 
 func NewOrderRepositoryDB(db *gorm.DB) orderRepositoryDB {
-	db.AutoMigrate(repository.Order{})
+	db.AutoMigrate(modelRepo.Order{})
 	return orderRepositoryDB{db: db}
 }
 
-func (r orderRepositoryDB) GetAll() ([]repository.Order, error) {
+func (r orderRepositoryDB) GetAll() ([]modelRepo.Order, error) {
 
-	orders := []repository.Order{}
+	orders := []modelRepo.Order{}
 
 	// query
 	tx := r.db.Find(&orders)
@@ -31,14 +31,14 @@ func (r orderRepositoryDB) GetAll() ([]repository.Order, error) {
 	return orders, nil
 }
 
-func (r orderRepositoryDB) GetById(id string) (*repository.Order, error) {
+func (r orderRepositoryDB) GetById(id string) (*modelRepo.Order, error) {
 
 	orderId, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
 	}
 
-	order := repository.Order{}
+	order := modelRepo.Order{}
 	tx := r.db.First(&order, orderId)
 	if tx.Error != nil {
 		return nil, tx.Error
@@ -46,9 +46,9 @@ func (r orderRepositoryDB) GetById(id string) (*repository.Order, error) {
 	return &order, nil
 }
 
-func (r orderRepositoryDB) Create(userId string, userOrg string, borrowDatetime time.Time, returnDatetime time.Time) (*repository.Order, error) {
+func (r orderRepositoryDB) Create(userId string, userOrg string, borrowDatetime time.Time, returnDatetime time.Time) (*modelRepo.Order, error) {
 
-	order := repository.Order{
+	order := modelRepo.Order{
 		UserId:         userId,
 		UserOrg:        userOrg,
 		BorrowDatetime: borrowDatetime,
@@ -63,7 +63,7 @@ func (r orderRepositoryDB) Create(userId string, userOrg string, borrowDatetime 
 	return &order, nil
 }
 
-func (r orderRepositoryDB) Update(id string, userId string, userOrg string, borrowDatetime time.Time, returnDatetime time.Time) (*repository.Order, error) {
+func (r orderRepositoryDB) Update(id string, userId string, userOrg string, borrowDatetime time.Time, returnDatetime time.Time) (*modelRepo.Order, error) {
 
 	orderId, err := strconv.Atoi(id)
 	if err != nil {
@@ -71,7 +71,7 @@ func (r orderRepositoryDB) Update(id string, userId string, userOrg string, borr
 	}
 
 	// Get data
-	order := repository.Order{}
+	order := modelRepo.Order{}
 	tx := r.db.First(&order, orderId)
 	if tx.Error != nil {
 		return nil, tx.Error
@@ -98,7 +98,7 @@ func (r orderRepositoryDB) DeleteById(id string) (error) {
 		return err
 	}
 
-	order := repository.Order{}
+	order := modelRepo.Order{}
 	tx := r.db.Delete(&order, orderId)
 	if tx.Error != nil {
 		return tx.Error

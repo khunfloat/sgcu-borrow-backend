@@ -1,7 +1,7 @@
 package repository
 
 import (
-	repository "github.com/khunfloat/sgcu-borrow-backend/repository/model"
+	modelRepo "github.com/khunfloat/sgcu-borrow-backend/model/repository"
 	"gorm.io/gorm"
 )
 
@@ -10,13 +10,13 @@ type adminRepositoryDB struct {
 }
 
 func NewAdminRepositoryDB(db *gorm.DB) adminRepositoryDB {
-	db.AutoMigrate(repository.Admin{})
+	db.AutoMigrate(modelRepo.Admin{})
 	return adminRepositoryDB{db: db}
 }
 
-func (r adminRepositoryDB) GetAll() ([]repository.Admin, error) {
+func (r adminRepositoryDB) GetAll() ([]modelRepo.Admin, error) {
 
-	admins := []repository.Admin{}
+	admins := []modelRepo.Admin{}
 	
 	// query
 	tx := r.db.Find(&admins)
@@ -27,9 +27,9 @@ func (r adminRepositoryDB) GetAll() ([]repository.Admin, error) {
 	return admins, nil
 }
 
-func (r adminRepositoryDB) GetById(id string) (*repository.Admin, error) {
+func (r adminRepositoryDB) GetById(id string) (*modelRepo.Admin, error) {
 
-	admin := repository.Admin{}
+	admin := modelRepo.Admin{}
 	tx := r.db.First(&admin, id)
 	if tx.Error != nil {
 		return nil, tx.Error
@@ -37,9 +37,9 @@ func (r adminRepositoryDB) GetById(id string) (*repository.Admin, error) {
 	return &admin, nil
 }
 
-func (r adminRepositoryDB) Create(id string, name string, password string) (*repository.Admin, error) {
+func (r adminRepositoryDB) Create(id string, name string, password string) (*modelRepo.Admin, error) {
 
-	admin := repository.Admin{
+	admin := modelRepo.Admin{
 		ID: id,
 		Name: name,
 		Password: password,
@@ -53,10 +53,10 @@ func (r adminRepositoryDB) Create(id string, name string, password string) (*rep
 	return &admin, nil
 }
 
-func (r adminRepositoryDB) Update(id string, name string, password string, banStatus int) (*repository.Admin, error) {
+func (r adminRepositoryDB) Update(id string, name string, password string, banStatus int) (*modelRepo.Admin, error) {
 
 	// Get data
-	admin := repository.Admin{}
+	admin := modelRepo.Admin{}
 	tx := r.db.First(&admin, id)
 	if tx.Error != nil {
 		return nil, tx.Error
