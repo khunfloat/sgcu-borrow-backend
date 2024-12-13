@@ -10,23 +10,23 @@ import (
 )
 
 type authHandler struct {
-	userAuthService modelServ.UserAuthService
+	userAuthService  modelServ.UserAuthService
 	staffAuthService modelServ.StaffAuthService
 }
 
 func NewAuthHandler(userAuthService modelServ.UserAuthService, staffAuthService modelServ.StaffAuthService) authHandler {
 	return authHandler{
-		userAuthService: userAuthService,
+		userAuthService:  userAuthService,
 		staffAuthService: staffAuthService,
 	}
 }
 
 func (h authHandler) UserSignUp(c *fiber.Ctx) error {
-	
+
 	var request modelServ.UserSignUpRequest
-    if err := c.BodyParser(&request); err != nil {
-       return handlerError(c, err)
-    }
+	if err := c.BodyParser(&request); err != nil {
+		return handlerError(c, err)
+	}
 
 	token, err := h.userAuthService.SignUp(request)
 	if err != nil {
@@ -37,11 +37,11 @@ func (h authHandler) UserSignUp(c *fiber.Ctx) error {
 }
 
 func (h authHandler) UserSignIn(c *fiber.Ctx) error {
-	
+
 	var request modelServ.UserSignInRequest
-    if err := c.BodyParser(&request); err != nil {
-       return handlerError(c, err)
-    }
+	if err := c.BodyParser(&request); err != nil {
+		return handlerError(c, err)
+	}
 
 	token, err := h.userAuthService.SignIn(request)
 	if err != nil {
@@ -52,11 +52,11 @@ func (h authHandler) UserSignIn(c *fiber.Ctx) error {
 }
 
 func (h authHandler) StaffSignUp(c *fiber.Ctx) error {
-	
+
 	var request modelServ.StaffSignUpRequest
-    if err := c.BodyParser(&request); err != nil {
-       return handlerError(c, err)
-    }
+	if err := c.BodyParser(&request); err != nil {
+		return handlerError(c, err)
+	}
 
 	token, err := h.staffAuthService.SignUp(request)
 	if err != nil {
@@ -67,11 +67,11 @@ func (h authHandler) StaffSignUp(c *fiber.Ctx) error {
 }
 
 func (h authHandler) StaffSignIn(c *fiber.Ctx) error {
-	
+
 	var request modelServ.StaffSignInRequest
-    if err := c.BodyParser(&request); err != nil {
-       return handlerError(c, err)
-    }
+	if err := c.BodyParser(&request); err != nil {
+		return handlerError(c, err)
+	}
 
 	token, err := h.staffAuthService.SignIn(request)
 	if err != nil {
@@ -91,10 +91,10 @@ func (h authHandler) AuthSuccessHandler(c *fiber.Ctx) error {
 }
 
 func (h authHandler) AuthorizationRequired() fiber.Handler {
-    return jwtware.New(jwtware.Config{
-		SigningMethod: "HS256",
-		SigningKey:   []byte(viper.GetString("app.jwt-secret")),
-		ErrorHandler: h.AuthErrorHandler,
+	return jwtware.New(jwtware.Config{
+		SigningMethod:  "HS256",
+		SigningKey:     []byte(viper.GetString("app.jwt-secret")),
+		ErrorHandler:   h.AuthErrorHandler,
 		SuccessHandler: h.AuthSuccessHandler,
 	})
 }
@@ -103,22 +103,22 @@ func (h authHandler) IsStaff(c *fiber.Ctx) error {
 	token := c.Locals("user").(*jwt.Token)
 	claims := token.Claims.(jwt.MapClaims)
 	role := claims["role"].(string)
-  
-	if role != "staff" {
-	  return handlerError(c, errs.NewUnAuthorizedError())
+
+	if role == "staff" || role == "admin" {
+		return c.Next()
 	}
-  
-	return c.Next()
+
+	return handlerError(c, errs.NewUnAuthorizedError())
 }
 
 func (h authHandler) IsAdmin(c *fiber.Ctx) error {
 	token := c.Locals("user").(*jwt.Token)
 	claims := token.Claims.(jwt.MapClaims)
 	role := claims["role"].(string)
-  
+
 	if role != "admin" {
-	  return handlerError(c, errs.NewUnAuthorizedError())
+		return handlerError(c, errs.NewUnAuthorizedError())
 	}
-  
+
 	return c.Next()
 }
