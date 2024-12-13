@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"strconv"
+	"fmt"
 
 	modelRepo "github.com/khunfloat/sgcu-borrow-backend/model/repository"
 	"gorm.io/gorm"
@@ -29,15 +29,22 @@ func (r itemRepositoryDB) GetAll() ([]modelRepo.Item, error) {
 	return items, nil
 }
 
-func (r itemRepositoryDB) GetById(id string) (*modelRepo.Item, error) {
+func (r itemRepositoryDB) GetFrequentlyBorrowed() ([]modelRepo.Item, error) {
+	
+	items := []modelRepo.Item{}
 
-	itemId, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
+	tx := r.db.Order("borrow_count DESC").Limit(10).Find(&items)
+	if tx.Error != nil {
+		return nil, tx.Error
 	}
 
+	return items, nil
+}
+
+func (r itemRepositoryDB) GetById(id int) (*modelRepo.Item, error) {
+
 	item := modelRepo.Item{}
-	tx := r.db.First(&item, itemId)
+	tx := r.db.First(&item, id)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -61,16 +68,11 @@ func (r itemRepositoryDB) Create(name string, currentAmount int, imgUrl string) 
 	return &item, nil
 }
 
-func (r itemRepositoryDB) Update(id string, name string, currentAmount int, imgUrl string, borrowCount int) (*modelRepo.Item, error) {
-
-	itemId, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
-	}
+func (r itemRepositoryDB) Update(id int, name string, currentAmount int, imgUrl string, borrowCount int) (*modelRepo.Item, error) {
 
 	// Get data
 	item := modelRepo.Item{}
-	tx := r.db.First(&item, itemId)
+	tx := r.db.First(&item, id)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -87,4 +89,19 @@ func (r itemRepositoryDB) Update(id string, name string, currentAmount int, imgU
 	}
 
 	return &item, nil
+}
+
+func (r itemRepositoryDB) DeleteById(id int) (error) {
+
+	item := modelRepo.Item{}
+	tx := r.db.Delete(&item, id)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	if tx.RowsAffected == 0 {
+        return fmt.Errorf("no record found with id %d", id)
+    }
+	
+	return nil
 }

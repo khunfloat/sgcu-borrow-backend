@@ -43,6 +43,7 @@ func (r staffRepositoryDB) Create(id string, name string, password string) (*mod
 		ID: id,
 		Name: name,
 		Password: password,
+		Role: "staff",
 	}
 
 	tx := r.db.Create(&staff)
@@ -53,7 +54,7 @@ func (r staffRepositoryDB) Create(id string, name string, password string) (*mod
 	return &staff, nil
 }
 
-func (r staffRepositoryDB) Update(id string, name string, password string) (*modelRepo.Staff, error) {
+func (r staffRepositoryDB) Update(id string, name string, password string, role string) (*modelRepo.Staff, error) {
 
 	// Get data
 	staff := modelRepo.Staff{}
@@ -65,6 +66,7 @@ func (r staffRepositoryDB) Update(id string, name string, password string) (*mod
 	// Update data
 	staff.Name = name
 	staff.Password = password
+	staff.Role = role
 
 	tx = r.db.Save(&staff)
 	if tx.Error != nil {

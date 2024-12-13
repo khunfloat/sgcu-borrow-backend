@@ -10,7 +10,9 @@ type Item struct {
 
 type ItemRepository interface {
 	GetAll() ([]Item, error)
-	GetById(string) (*Item, error)
+	GetFrequentlyBorrowed() ([]Item, error)
+	GetById(int) (*Item, error)
 	Create(string, int, string) (*Item, error)
-	Update(string, string, int, string, int) (*Item, error)
+	Update(int, string, int, string, int) (*Item, error)
+	DeleteById(int) (error)
 }

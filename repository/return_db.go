@@ -117,7 +117,7 @@ func (r returnRepositoryDB) DeleteById(id string) (error) {
 		return err
 	}
 
-	returnItem := modelRepo.Borrow{}
+	returnItem := modelRepo.Return{}
 	tx := r.db.Delete(&returnItem, returnId)
 	if tx.Error != nil {
 		return tx.Error

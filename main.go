@@ -6,6 +6,10 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/khunfloat/sgcu-borrow-backend/handler"
+	"github.com/khunfloat/sgcu-borrow-backend/logs"
+	"github.com/khunfloat/sgcu-borrow-backend/repository"
+	"github.com/khunfloat/sgcu-borrow-backend/service"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -24,9 +28,45 @@ func main() {
 	app := initApp()
 	app.Use(cors.New())
 	api := app.Group("/api")
-	
-	_ = db
-	_ = api
+
+	userAPI := api.Group("")
+	staffAPI := api.Group("")
+
+	userRepository := repository.NewUserRepositoryDB(db)
+	userAuthService := service.NewUserAuthService(userRepository)
+	userAuthHandler := handler.NewUserAuthHandler(userAuthService)
+
+	staffRepository := repository.NewStaffRepositoryDB(db)
+	staffAuthService := service.NewStaffAuthService(staffRepository)
+	staffAuthHandler := handler.NewStaffAuthHandler(staffAuthService)
+
+	itemRepository := repository.NewItemRepositoryDB(db)
+	itemService := service.NewItemService(itemRepository)
+	itemHandler := handler.NewItemHandler(itemService)
+
+	// public api
+	userAPI.Post("/signup", userAuthHandler.SignUp)
+	userAPI.Post("/signin", userAuthHandler.SignIn)
+	staffAPI.Post("/staff/signup", staffAuthHandler.SignUp)
+	staffAPI.Post("/staff/signin", staffAuthHandler.SignIn)
+
+	// user api
+	userAPI.Get("/items", itemHandler.GetItems)
+	userAPI.Get("/item/:item_id", itemHandler.GetItem)
+
+	// staff api
+	staffAPI.Use(staffAuthHandler.AuthorizationRequired())
+	staffAPI.Use(staffAuthHandler.IsStaff)
+
+	staffAPI.Post("/item/create", itemHandler.CreateItem)
+	staffAPI.Put("/item/update", itemHandler.UpdateItem)
+	staffAPI.Delete("/item/:item_id", itemHandler.DeleteItem)
+
+	// admin api
+
+	// Start server
+	logs.Info("CUBS coin service started at port " + viper.GetString("app.port"))
+	app.Listen(fmt.Sprintf(":%v", viper.GetInt("app.port")))
 }
 
 func initConfig() {

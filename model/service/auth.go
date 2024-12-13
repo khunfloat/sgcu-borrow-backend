@@ -1,14 +1,26 @@
 package model
 
-type SignUpRequest struct {
-	StudentId string `json:"student_id"`
-	Name      string `json:"name"`
-	Password  string `json:"password"`
+type UserSignUpRequest struct {
+	UserId   string `json:"user_id"`
+	Name     string `json:"name"`
+	Tel      string `json:"tel"`
+	Password string `json:"password"`
 }
 
-type SignInRequest struct {
-	StudentId string `json:"student_id"`
-	Password  string `json:"password"`
+type StaffSignUpRequest struct {
+	StaffId  string `json:"staff_id"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
+}
+
+type UserSignInRequest struct {
+	UserId   string `json:"user_id"`
+	Password string `json:"password"`
+}
+
+type StaffSignInRequest struct {
+	StaffId  string `json:"staff_id"`
+	Password string `json:"password"`
 }
 
 type TokenResponse struct {
@@ -17,7 +29,12 @@ type TokenResponse struct {
 	User  string `json:"user"`
 }
 
-type AuthService interface {
-	SignUp(SignUpRequest) (*TokenResponse, error)
-	SignIn(SignInRequest) (*TokenResponse, error)
+type UserAuthService interface {
+	SignUp(UserSignUpRequest) (*TokenResponse, error)
+	SignIn(UserSignInRequest) (*TokenResponse, error)
+}
+
+type StaffAuthService interface {
+	SignUp(StaffSignUpRequest) (*TokenResponse, error)
+	SignIn(StaffSignInRequest) (*TokenResponse, error)
 }
