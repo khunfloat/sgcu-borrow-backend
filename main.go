@@ -29,40 +29,40 @@ func main() {
 	app.Use(cors.New())
 	api := app.Group("/api")
 
-	userAPI := api.Group("")
-	staffAPI := api.Group("")
-
 	userRepository := repository.NewUserRepositoryDB(db)
 	userAuthService := service.NewUserAuthService(userRepository)
-	userAuthHandler := handler.NewUserAuthHandler(userAuthService)
+
 
 	staffRepository := repository.NewStaffRepositoryDB(db)
 	staffAuthService := service.NewStaffAuthService(staffRepository)
-	staffAuthHandler := handler.NewStaffAuthHandler(staffAuthService)
+
+	authHandler := handler.NewAuthHandler(userAuthService, staffAuthService)
 
 	itemRepository := repository.NewItemRepositoryDB(db)
 	itemService := service.NewItemService(itemRepository)
 	itemHandler := handler.NewItemHandler(itemService)
 
 	// public api
-	userAPI.Post("/signup", userAuthHandler.SignUp)
-	userAPI.Post("/signin", userAuthHandler.SignIn)
-	staffAPI.Post("/staff/signup", staffAuthHandler.SignUp)
-	staffAPI.Post("/staff/signin", staffAuthHandler.SignIn)
+	api.Post("/signup", authHandler.UserSignUp)
+	api.Post("/signin", authHandler.UserSignIn)
+	api.Post("/staff/signup", authHandler.StaffSignUp)
+	api.Post("/staff/signin", authHandler.StaffSignIn)
 
 	// user api
-	userAPI.Get("/items", itemHandler.GetItems)
-	userAPI.Get("/item/:item_id", itemHandler.GetItem)
+	api.Use(authHandler.AuthorizationRequired())
+
+	api.Get("/items", itemHandler.GetItems)
+	api.Get("/item/:item_id", itemHandler.GetItem)
 
 	// staff api
-	staffAPI.Use(staffAuthHandler.AuthorizationRequired())
-	staffAPI.Use(staffAuthHandler.IsStaff)
+	api.Use(authHandler.IsStaff)
 
-	staffAPI.Post("/item/create", itemHandler.CreateItem)
-	staffAPI.Put("/item/update", itemHandler.UpdateItem)
-	staffAPI.Delete("/item/:item_id", itemHandler.DeleteItem)
+	api.Post("/item/create", itemHandler.CreateItem)
+	api.Put("/item/update", itemHandler.UpdateItem)
+	api.Delete("/item/:item_id", itemHandler.DeleteItem)
 
 	// admin api
+	api.Use(authHandler.IsAdmin)
 
 	// Start server
 	logs.Info("CUBS coin service started at port " + viper.GetString("app.port"))
