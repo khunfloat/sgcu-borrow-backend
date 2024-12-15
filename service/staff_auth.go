@@ -56,7 +56,8 @@ func (s staffAuthService) SignUp(staffSignUpRequest modelServ.StaffSignUpRequest
 	tokenResponse := modelServ.TokenResponse{
 		Token: token,
 		Exp:   exp,
-		User: staffId,
+		ID: staffId,
+		Name: staff.Name,
 	}
 
 	return &tokenResponse, nil
@@ -90,7 +91,8 @@ func (s staffAuthService) SignIn(staffSignInRequest modelServ.StaffSignInRequest
 	tokenResponse := modelServ.TokenResponse{
 		Token: token,
 		Exp:   exp,
-		User: staffId,
+		ID: staffId,
+		Name: staff.Name,
 	}
 
 	return &tokenResponse, nil

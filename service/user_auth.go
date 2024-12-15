@@ -35,7 +35,7 @@ func (s userAuthService) SignUp(userSignUpRequest modelServ.UserSignUpRequest) (
 	}
 	password = string(hash)
 
-	_, err = s.userRepository.Create(userId, name, tel ,password)
+	user, err := s.userRepository.Create(userId, name, tel ,password)
 	if err != nil {
 
 		if err == gorm.ErrDuplicatedKey {
@@ -55,7 +55,8 @@ func (s userAuthService) SignUp(userSignUpRequest modelServ.UserSignUpRequest) (
 	tokenResponse := modelServ.TokenResponse{
 		Token: token,
 		Exp:   exp,
-		User: userId,
+		ID: userId,
+		Name: user.Name,
 	}
 
 	return &tokenResponse, nil
@@ -87,7 +88,8 @@ func (s userAuthService) SignIn(userSignInRequest modelServ.UserSignInRequest) (
 	tokenResponse := modelServ.TokenResponse{
 		Token: token,
 		Exp:   exp,
-		User: userId,
+		ID: userId,
+		Name: user.Name,
 	}
 
 	return &tokenResponse, nil

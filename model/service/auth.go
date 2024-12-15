@@ -26,7 +26,8 @@ type StaffSignInRequest struct {
 type TokenResponse struct {
 	Token string `json:"token"`
 	Exp   int64  `json:"exp"`
-	User  string `json:"user"`
+	ID    string `json:"id"`
+	Name  string `json:"name"`
 }
 
 type UserAuthService interface {
