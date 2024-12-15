@@ -1,0 +1,131 @@
+basePath: /api
+definitions:
+  model.StaffSignInRequest:
+    properties:
+      password:
+        type: string
+      staff_id:
+        type: string
+    type: object
+  model.StaffSignUpRequest:
+    properties:
+      name:
+        type: string
+      password:
+        type: string
+      staff_id:
+        type: string
+    type: object
+  model.UserSignInRequest:
+    properties:
+      password:
+        type: string
+      user_id:
+        type: string
+    type: object
+  model.UserSignUpRequest:
+    properties:
+      name:
+        type: string
+      password:
+        type: string
+      tel:
+        type: string
+      user_id:
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+    url: http://example.com/contact
+  description: This is an example server.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://example.com/terms/
+  title: SGCU Borrowing System API
+  version: "1.0"
+paths:
+  /signin:
+    post:
+      consumes:
+      - application/json
+      description: Log in an existing user account
+      parameters:
+      - description: User Sign In Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserSignInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: User Sign In
+      tags:
+      - Auth
+  /signup:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user account
+      parameters:
+      - description: User Sign Up Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserSignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: User Sign Up
+      tags:
+      - Auth
+  /staff/signin:
+    post:
+      consumes:
+      - application/json
+      description: Log in an existing staff account
+      parameters:
+      - description: Staff Sign In Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.StaffSignInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Staff Sign In
+      tags:
+      - Auth
+  /staff/signup:
+    post:
+      consumes:
+      - application/json
+      description: Register a new staff account
+      parameters:
+      - description: Staff Sign Up Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.StaffSignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Staff Sign Up
+      tags:
+      - Auth
+swagger: "2.0"

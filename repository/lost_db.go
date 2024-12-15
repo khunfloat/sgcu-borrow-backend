@@ -2,7 +2,6 @@ package repository
 
 import (
 	"fmt"
-	"strconv"
 
 	modelRepo "github.com/khunfloat/sgcu-borrow-backend/model/repository"
 	"gorm.io/gorm"
@@ -30,36 +29,21 @@ func (r lostRepositoryDB) GetAll() ([]modelRepo.Lost, error) {
 	return losts, nil
 }
 
-func (r lostRepositoryDB) GetById(id string) (*modelRepo.Lost, error) {
-
-	lostId, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
-	}
+func (r lostRepositoryDB) GetById(id int) (*modelRepo.Lost, error) {
 
 	lost := modelRepo.Lost{}
-	tx := r.db.First(&lost, lostId)
+	tx := r.db.First(&lost, id)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
 	return &lost, nil
 }
 
-func (r lostRepositoryDB) Create(orderId string, itemId string, amount int) (*modelRepo.Lost, error) {
-
-	orderIdInt, err := strconv.Atoi(orderId)
-	if err != nil {
-		return nil, err
-	}
-
-	itemIdInt, err := strconv.Atoi(itemId)
-	if err != nil {
-		return nil, err
-	}
+func (r lostRepositoryDB) Create(orderId int, itemId int, amount int) (*modelRepo.Lost, error) {
 
 	lost := modelRepo.Lost{
-		OrderId: orderIdInt,
-		ItemId: itemIdInt,
+		OrderId: orderId,
+		ItemId: itemId,
 		Amount: amount,
 	}
 
@@ -71,33 +55,18 @@ func (r lostRepositoryDB) Create(orderId string, itemId string, amount int) (*mo
 	return &lost, nil
 }
 
-func (r lostRepositoryDB) Update(id string, orderId string, itemId string, amount int) (*modelRepo.Lost, error) {
-
-	orderIdInt, err := strconv.Atoi(orderId)
-	if err != nil {
-		return nil, err
-	}
-
-	itemIdInt, err := strconv.Atoi(itemId)
-	if err != nil {
-		return nil, err
-	}
-
-	lostId, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
-	}
+func (r lostRepositoryDB) Update(id int, orderId int, itemId int, amount int) (*modelRepo.Lost, error) {
 
 	// Get data
 	lost := modelRepo.Lost{}
-	tx := r.db.First(&lost, lostId)
+	tx := r.db.First(&lost, id)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
 
 	// Update data
-	lost.OrderId = orderIdInt
-	lost.ItemId = itemIdInt
+	lost.OrderId = orderId
+	lost.ItemId = itemId
 	lost.Amount = amount
 
 	tx = r.db.Save(&lost)
@@ -108,21 +77,16 @@ func (r lostRepositoryDB) Update(id string, orderId string, itemId string, amoun
 	return &lost, nil
 }
 
-func (r lostRepositoryDB) DeleteById(id string) (error) {
-
-	lostId, err := strconv.Atoi(id)
-	if err != nil {
-		return err
-	}
+func (r lostRepositoryDB) DeleteById(id int) (error) {
 
 	lost := modelRepo.Borrow{}
-	tx := r.db.Delete(&lost, lostId)
+	tx := r.db.Delete(&lost, id)
 	if tx.Error != nil {
 		return tx.Error
 	}
 
 	if tx.RowsAffected == 0 {
-        return fmt.Errorf("no record found with id %d", lostId)
+        return fmt.Errorf("no record found with id %d", id)
     }
 	
 	return nil

@@ -2,7 +2,6 @@ package repository
 
 import (
 	"fmt"
-	"strconv"
 	"time"
 
 	modelRepo "github.com/khunfloat/sgcu-borrow-backend/model/repository"
@@ -31,28 +30,28 @@ func (r orderRepositoryDB) GetAll() ([]modelRepo.Order, error) {
 	return orders, nil
 }
 
-func (r orderRepositoryDB) GetById(id string) (*modelRepo.Order, error) {
-
-	orderId, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
-	}
+func (r orderRepositoryDB) GetById(id int) (*modelRepo.Order, error) {
 
 	order := modelRepo.Order{}
-	tx := r.db.First(&order, orderId)
+	tx := r.db.First(&order, id)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
 	return &order, nil
 }
 
-func (r orderRepositoryDB) Create(userId string, userOrg string, borrowDatetime time.Time, returnDatetime time.Time) (*modelRepo.Order, error) {
+func (r orderRepositoryDB) Create(
+	userId string,
+	userOrg string,
+	borrowDatetime time.Time,
+	returnDatetime time.Time,
+) (*modelRepo.Order, error) {
 
 	order := modelRepo.Order{
-		UserId:         userId,
-		UserOrg:        userOrg,
-		BorrowDatetime: borrowDatetime,
-		ReturnDatetime: returnDatetime,
+		UserId:          userId,
+		UserOrg:         userOrg,
+		BorrowDatetime:  borrowDatetime,
+		ReturnDatetime:  returnDatetime,
 	}
 
 	tx := r.db.Create(&order)
@@ -63,16 +62,17 @@ func (r orderRepositoryDB) Create(userId string, userOrg string, borrowDatetime 
 	return &order, nil
 }
 
-func (r orderRepositoryDB) Update(id string, userId string, userOrg string, borrowDatetime time.Time, returnDatetime time.Time) (*modelRepo.Order, error) {
-
-	orderId, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
-	}
+func (r orderRepositoryDB) UpdateInfo(
+	id int,
+	userId string,
+	userOrg string,
+	borrowDatetime time.Time,
+	returnDatetime time.Time,
+) (*modelRepo.Order, error) {
 
 	// Get data
 	order := modelRepo.Order{}
-	tx := r.db.First(&order, orderId)
+	tx := r.db.First(&order, id)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -91,22 +91,63 @@ func (r orderRepositoryDB) Update(id string, userId string, userOrg string, borr
 	return &order, nil
 }
 
-func (r orderRepositoryDB) DeleteById(id string) (error) {
+func (r orderRepositoryDB) UpdatePickupDatetime(
+	id int,
+	pickupDatetime time.Time,
+) (*modelRepo.Order, error) {
 
-	orderId, err := strconv.Atoi(id)
-	if err != nil {
-		return err
+	// Get data
+	order := modelRepo.Order{}
+	tx := r.db.First(&order, id)
+	if tx.Error != nil {
+		return nil, tx.Error
 	}
 
+	// Update data
+	order.PickupDatetime = pickupDatetime
+
+	tx = r.db.Save(&order)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	return &order, nil
+}
+
+func (r orderRepositoryDB) UpdateReturnDatetime(
+	id int,
+	returnDatetime time.Time,
+) (*modelRepo.Order, error) {
+
+	// Get data
 	order := modelRepo.Order{}
-	tx := r.db.Delete(&order, orderId)
+	tx := r.db.First(&order, id)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	// Update data
+	order.ReturnDatetime = returnDatetime
+
+	tx = r.db.Save(&order)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	return &order, nil
+}
+
+func (r orderRepositoryDB) DeleteById(id int) error {
+
+	order := modelRepo.Order{}
+	tx := r.db.Delete(&order, id)
 	if tx.Error != nil {
 		return tx.Error
 	}
 
 	if tx.RowsAffected == 0 {
-        return fmt.Errorf("no record found with id %d", orderId)
-    }
-	
+		return fmt.Errorf("no record found with id %d", id)
+	}
+
 	return nil
 }

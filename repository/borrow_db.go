@@ -2,8 +2,6 @@ package repository
 
 import (
 	"fmt"
-	"strconv"
-	"time"
 
 	modelRepo "github.com/khunfloat/sgcu-borrow-backend/model/repository"
 	"gorm.io/gorm"
@@ -31,36 +29,47 @@ func (r borrowRepositoryDB) GetAll() ([]modelRepo.Borrow, error) {
 	return borrows, nil
 }
 
-func (r borrowRepositoryDB) GetById(id string) (*modelRepo.Borrow, error) {
+func (r borrowRepositoryDB) GetByOrderId(orderId int) ([]modelRepo.Borrow, error) {
 
-	borrowId, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
+	borrows := []modelRepo.Borrow{}
+
+	// query
+	tx := r.db.Where("order_id = ?", orderId).Find(&borrows)
+	if tx.Error != nil {
+		return nil, tx.Error
 	}
 
+	return borrows, nil
+}
+
+func (r borrowRepositoryDB) GetByOrderIdAndItemId(orderId int, itemId int) (*modelRepo.Borrow, error) {
+
 	borrow := modelRepo.Borrow{}
-	tx := r.db.First(&borrow, borrowId)
+
+	// query
+	tx := r.db.Where("order_id = ?", orderId).Where("item_id", itemId).Find(&borrow)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	return &borrow, nil
+}
+
+func (r borrowRepositoryDB) GetById(id int) (*modelRepo.Borrow, error) {
+
+	borrow := modelRepo.Borrow{}
+	tx := r.db.First(&borrow, id)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
 	return &borrow, nil
 }
 
-func (r borrowRepositoryDB) Create(orderId string, itemId string, amount int) (*modelRepo.Borrow, error) {
-
-	orderIdInt, err := strconv.Atoi(orderId)
-	if err != nil {
-		return nil, err
-	}
-
-	itemIdInt, err := strconv.Atoi(itemId)
-	if err != nil {
-		return nil, err
-	}
+func (r borrowRepositoryDB) Create(orderId int, itemId int, amount int) (*modelRepo.Borrow, error) {
 
 	borrow := modelRepo.Borrow{
-		OrderId: orderIdInt,
-		ItemId: itemIdInt,
+		OrderId: orderId,
+		ItemId: itemId,
 		Amount: amount,
 	}
 
@@ -72,35 +81,19 @@ func (r borrowRepositoryDB) Create(orderId string, itemId string, amount int) (*
 	return &borrow, nil
 }
 
-func (r borrowRepositoryDB) Update(id string, orderId string, itemId string, amount int, pickupDatetime time.Time) (*modelRepo.Borrow, error) {
-
-	orderIdInt, err := strconv.Atoi(orderId)
-	if err != nil {
-		return nil, err
-	}
-
-	itemIdInt, err := strconv.Atoi(itemId)
-	if err != nil {
-		return nil, err
-	}
-
-	borrowId, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
-	}
+func (r borrowRepositoryDB) Update(id int, orderId int, itemId int, amount int) (*modelRepo.Borrow, error) {
 
 	// Get data
 	borrow := modelRepo.Borrow{}
-	tx := r.db.First(&borrow, borrowId)
+	tx := r.db.First(&borrow, id)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
 
 	// Update data
-	borrow.OrderId = orderIdInt
-	borrow.ItemId = itemIdInt
+	borrow.OrderId = orderId
+	borrow.ItemId = itemId
 	borrow.Amount = amount
-	borrow.PickupDatetime = pickupDatetime
 
 	tx = r.db.Save(&borrow)
 	if tx.Error != nil {
@@ -110,21 +103,16 @@ func (r borrowRepositoryDB) Update(id string, orderId string, itemId string, amo
 	return &borrow, nil
 }
 
-func (r borrowRepositoryDB) DeleteById(id string) (error) {
-
-	borrowId, err := strconv.Atoi(id)
-	if err != nil {
-		return err
-	}
+func (r borrowRepositoryDB) DeleteById(id int) (error) {
 
 	borrow := modelRepo.Borrow{}
-	tx := r.db.Delete(&borrow, borrowId)
+	tx := r.db.Delete(&borrow, id)
 	if tx.Error != nil {
 		return tx.Error
 	}
 
 	if tx.RowsAffected == 0 {
-        return fmt.Errorf("no record found with id %d", borrowId)
+        return fmt.Errorf("no record found with id %d", id)
     }
 	
 	return nil

@@ -6,6 +6,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/swagger"
+	_ "github.com/khunfloat/sgcu-borrow-backend/docs"
 	"github.com/khunfloat/sgcu-borrow-backend/handler"
 	"github.com/khunfloat/sgcu-borrow-backend/logs"
 	"github.com/khunfloat/sgcu-borrow-backend/repository"
@@ -15,6 +17,21 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
+
+// @title           SGCU Borrowing System API
+// @version         1.0
+// @description     This is an example server.
+// @termsOfService  http://example.com/terms/
+
+// @contact.name   API Support
+// @contact.url    http://example.com/contact
+// @contact.email  support@example.com
+
+// @license.name  MIT
+// @license.url   https://opensource.org/licenses/MIT
+
+// @host      localhost:8000
+// @BasePath  /api
 
 func main() {
 
@@ -27,11 +44,14 @@ func main() {
 	// Init fiber app
 	app := initApp()
 	app.Use(cors.New())
+
+	docs := app.Group("/docs")
+	docs.Get("/*", swagger.HandlerDefault)
+
 	api := app.Group("/api")
 
 	userRepository := repository.NewUserRepositoryDB(db)
 	userAuthService := service.NewUserAuthService(userRepository)
-
 
 	staffRepository := repository.NewStaffRepositoryDB(db)
 	staffAuthService := service.NewStaffAuthService(staffRepository)
@@ -42,30 +62,50 @@ func main() {
 	itemService := service.NewItemService(itemRepository)
 	itemHandler := handler.NewItemHandler(itemService)
 
+	orderRepository := repository.NewOrderRepositoryDB(db)
+	borrowRepository := repository.NewBorrowRepositoryDB(db)
+	returnRepository := repository.NewReturnRepositoryDB(db)
+	lostRepository := repository.NewLostRepositoryDB(db)
+
+	orderService := service.NewOrderService(
+		orderRepository,
+		itemRepository,
+		borrowRepository,
+		returnRepository,
+		lostRepository,
+	)
+	orderHandler := handler.NewOrderHandler(orderService)
+
 	// public api
 	api.Post("/signup", authHandler.UserSignUp)
 	api.Post("/signin", authHandler.UserSignIn)
 	api.Post("/staff/signup", authHandler.StaffSignUp)
 	api.Post("/staff/signin", authHandler.StaffSignIn)
 
-	// user api
-	api.Use(authHandler.AuthorizationRequired())
+	api.Get("/orders", orderHandler.GetOrders)
+	api.Get("/order/:order_id", orderHandler.GetOrder)
+	api.Post("/order", orderHandler.CreateOrder)
+	api.Put("/order", orderHandler.UpdateOrder)
+	api.Delete("/order/:order_id", orderHandler.DeleteOrder)
 
-	api.Get("/items", itemHandler.GetItems)
-	api.Get("/item/:item_id", itemHandler.GetItem)
+	// user api
+	// api.Use(authHandler.AuthorizationRequired())
+
+	
 
 	// staff api
-	api.Use(authHandler.IsStaff)
-
-	api.Post("/item/create", itemHandler.CreateItem)
-	api.Put("/item/update", itemHandler.UpdateItem)
+	// api.Use(authHandler.IsStaff)
+	api.Get("/items", itemHandler.GetItems)
+	api.Get("/item/:item_id", itemHandler.GetItem)
+	api.Post("/item", itemHandler.CreateItem)
+	api.Put("/item", itemHandler.UpdateItem)
 	api.Delete("/item/:item_id", itemHandler.DeleteItem)
 
 	// admin api
-	api.Use(authHandler.IsAdmin)
+	// api.Use(authHandler.IsAdmin)
 
 	// Start server
-	logs.Info("CUBS coin service started at port " + viper.GetString("app.port"))
+	logs.Info("SGCU borrowing service started at port " + viper.GetString("app.port"))
 	app.Listen(fmt.Sprintf(":%v", viper.GetInt("app.port")))
 }
 
@@ -90,8 +130,8 @@ func initDatabase() *gorm.DB {
 
 	dial := mysql.Open(dsn)
 	db, err := gorm.Open(dial, &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
-        TranslateError: true,
+		Logger:         logger.Default.LogMode(logger.Silent),
+		TranslateError: true,
 	})
 	if err != nil {
 		panic(err)
@@ -110,7 +150,7 @@ func initTimeZone() {
 }
 
 func initApp() *fiber.App {
-    return fiber.New(fiber.Config{
+	return fiber.New(fiber.Config{
 		DisableStartupMessage: true,
 		Prefork:               viper.GetBool("app.prefork"),
 		AppName:               viper.GetString("app.name"),

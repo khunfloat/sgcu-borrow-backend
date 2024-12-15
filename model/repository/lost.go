@@ -9,8 +9,8 @@ type Lost struct {
 
 type LostRepository interface {
 	GetAll() ([]Lost, error)
-	GetById(string) (*Lost, error)
-	Create(string, string, int) (*Lost, error)
-	Update(string, string, string, int) (*Lost, error)
-	DeleteById(string) (error)
+	GetById(int) (*Lost, error)
+	Create(int, int, int) (*Lost, error)
+	Update(int, int, int, int) (*Lost, error)
+	DeleteById(int) (error)
 }

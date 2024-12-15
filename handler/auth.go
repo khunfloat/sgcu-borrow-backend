@@ -21,6 +21,14 @@ func NewAuthHandler(userAuthService modelServ.UserAuthService, staffAuthService 
 	}
 }
 
+// @Summary User Sign Up
+// @Description Register a new user account
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body modelServ.UserSignUpRequest true "User Sign Up Request"
+// @Success 200
+// @Router /signup [post]
 func (h authHandler) UserSignUp(c *fiber.Ctx) error {
 
 	var request modelServ.UserSignUpRequest
@@ -36,6 +44,14 @@ func (h authHandler) UserSignUp(c *fiber.Ctx) error {
 	return c.JSON(token)
 }
 
+// @Summary User Sign In
+// @Description Log in an existing user account
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body modelServ.UserSignInRequest true "User Sign In Request"
+// @Success 200 
+// @Router /signin [post]
 func (h authHandler) UserSignIn(c *fiber.Ctx) error {
 
 	var request modelServ.UserSignInRequest
@@ -51,6 +67,14 @@ func (h authHandler) UserSignIn(c *fiber.Ctx) error {
 	return c.JSON(token)
 }
 
+// @Summary Staff Sign Up
+// @Description Register a new staff account
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body modelServ.StaffSignUpRequest true "Staff Sign Up Request"
+// @Success 200
+// @Router /staff/signup [post]
 func (h authHandler) StaffSignUp(c *fiber.Ctx) error {
 
 	var request modelServ.StaffSignUpRequest
@@ -66,6 +90,14 @@ func (h authHandler) StaffSignUp(c *fiber.Ctx) error {
 	return c.JSON(token)
 }
 
+// @Summary Staff Sign In
+// @Description Log in an existing staff account
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body modelServ.StaffSignInRequest true "Staff Sign In Request"
+// @Success 200 
+// @Router /staff/signin [post]
 func (h authHandler) StaffSignIn(c *fiber.Ctx) error {
 
 	var request modelServ.StaffSignInRequest
