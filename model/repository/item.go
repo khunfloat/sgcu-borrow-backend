@@ -14,5 +14,8 @@ type ItemRepository interface {
 	GetById(int) (*Item, error)
 	Create(string, int, string) (*Item, error)
 	Update(int, string, int, string, int) (*Item, error)
+	AddCurrentAmount(int, int) (*Item, error)
+	SubtractCurrentAmount(int, int) (*Item, error)
+	UpdateCurrentAmount(int, int) (*Item, error)
 	DeleteById(int) (error)
 }

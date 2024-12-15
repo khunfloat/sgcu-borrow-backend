@@ -105,3 +105,19 @@ func (h orderHandler) PickupOrder(c *fiber.Ctx) error {
 
 	return c.JSON(order)
 }
+
+func (h orderHandler) DropoffOrder(c *fiber.Ctx) error {
+	
+	var request modelServ.CheckOrderRequest
+
+    if err := c.BodyParser(&request); err != nil {
+       return handlerError(c, err)
+    }
+
+	order, err := h.orderService.DropoffOrder(request)
+	if err != nil {
+		return handlerError(c, err)
+	}
+
+	return c.JSON(order)
+}

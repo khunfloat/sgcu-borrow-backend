@@ -18,6 +18,6 @@ type OrderRepository interface {
 	Create(string, string, time.Time, time.Time) (*Order, error)
 	UpdateInfo(int, string, string, time.Time, time.Time) (*Order, error)
 	UpdatePickupDatetime(int, time.Time) (*Order, error)
-	UpdateReturnDatetime(int, time.Time) (*Order, error)
+	UpdateDropoffDatetime(int, time.Time) (*Order, error)
 	DeleteById(int) error
 }

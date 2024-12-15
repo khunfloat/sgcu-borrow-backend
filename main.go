@@ -89,6 +89,7 @@ func main() {
 	api.Delete("/order/:order_id", orderHandler.DeleteOrder)
 
 	api.Post("/pickup", orderHandler.PickupOrder)
+	api.Post("/dropoff", orderHandler.DropoffOrder)
 
 	// user api
 	// api.Use(authHandler.AuthorizationRequired())

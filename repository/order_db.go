@@ -110,13 +110,13 @@ func (r orderRepositoryDB) UpdatePickupDatetime(
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
-	
+
 	return &order, nil
 }
 
-func (r orderRepositoryDB) UpdateReturnDatetime(
+func (r orderRepositoryDB) UpdateDropoffDatetime(
 	id int,
-	returnDatetime time.Time,
+	dropoffDatetime time.Time,
 ) (*modelRepo.Order, error) {
 
 	// Get data
@@ -127,7 +127,7 @@ func (r orderRepositoryDB) UpdateReturnDatetime(
 	}
 
 	// Update data
-	order.ReturnDatetime = returnDatetime
+	order.DropoffDatetime = dropoffDatetime
 
 	tx = r.db.Save(&order)
 	if tx.Error != nil {

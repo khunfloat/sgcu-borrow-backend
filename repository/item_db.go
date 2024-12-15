@@ -91,6 +91,66 @@ func (r itemRepositoryDB) Update(id int, name string, currentAmount int, imgUrl 
 	return &item, nil
 }
 
+func (r itemRepositoryDB) AddCurrentAmount(id int, amount int) (*modelRepo.Item, error) {
+
+	// Get data
+	item := modelRepo.Item{}
+	tx := r.db.First(&item, id)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	
+	// Update data
+	item.CurrentAmount += amount
+
+	tx = r.db.Save(&item)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	return &item, nil
+}
+
+func (r itemRepositoryDB) UpdateCurrentAmount(id int, amount int) (*modelRepo.Item, error) {
+
+	// Get data
+	item := modelRepo.Item{}
+	tx := r.db.First(&item, id)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	
+	// Update data
+	item.CurrentAmount = amount
+
+	tx = r.db.Save(&item)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	return &item, nil
+}
+
+func (r itemRepositoryDB) SubtractCurrentAmount(id int, amount int) (*modelRepo.Item, error) {
+
+	// Get data
+	item := modelRepo.Item{}
+	tx := r.db.First(&item, id)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	
+	// Update data
+	item.CurrentAmount -= amount
+
+	tx = r.db.Save(&item)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	return &item, nil
+}
+
 func (r itemRepositoryDB) DeleteById(id int) (error) {
 
 	item := modelRepo.Item{}

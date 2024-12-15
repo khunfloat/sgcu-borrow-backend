@@ -47,7 +47,7 @@ func (r borrowRepositoryDB) GetByOrderIdAndItemId(orderId int, itemId int) (*mod
 	borrow := modelRepo.Borrow{}
 
 	// query
-	tx := r.db.Where("order_id = ?", orderId).Where("item_id", itemId).Find(&borrow)
+	tx := r.db.Where("order_id = ?", orderId).Where("item_id", itemId).First(&borrow)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
