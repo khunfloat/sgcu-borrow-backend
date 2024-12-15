@@ -14,7 +14,6 @@ type orderService struct {
 	orderRepository  modelRepo.OrderRepository
 	itemRepository   modelRepo.ItemRepository
 	borrowRepository modelRepo.BorrowRepository
-	returnRepository modelRepo.ReturnRepository
 	lostRespository  modelRepo.LostRepository
 }
 
@@ -22,14 +21,12 @@ func NewOrderService(
 	orderRepository modelRepo.OrderRepository,
 	itemRepository modelRepo.ItemRepository,
 	borrowRepository modelRepo.BorrowRepository,
-	returnRepository modelRepo.ReturnRepository,
 	lostRespository modelRepo.LostRepository,
 ) orderService {
 	return orderService{
 		orderRepository:  orderRepository,
 		itemRepository:   itemRepository,
 		borrowRepository: borrowRepository,
-		returnRepository: returnRepository,
 		lostRespository:  lostRespository,
 	}
 }

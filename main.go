@@ -64,14 +64,12 @@ func main() {
 
 	orderRepository := repository.NewOrderRepositoryDB(db)
 	borrowRepository := repository.NewBorrowRepositoryDB(db)
-	returnRepository := repository.NewReturnRepositoryDB(db)
 	lostRepository := repository.NewLostRepositoryDB(db)
 
 	orderService := service.NewOrderService(
 		orderRepository,
 		itemRepository,
 		borrowRepository,
-		returnRepository,
 		lostRepository,
 	)
 	orderHandler := handler.NewOrderHandler(orderService)
