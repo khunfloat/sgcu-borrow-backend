@@ -110,7 +110,7 @@ func (r orderRepositoryDB) UpdatePickupDatetime(
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
-
+	
 	return &order, nil
 }
 

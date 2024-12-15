@@ -88,6 +88,8 @@ func main() {
 	api.Put("/order", orderHandler.UpdateOrder)
 	api.Delete("/order/:order_id", orderHandler.DeleteOrder)
 
+	api.Post("/pickup", orderHandler.PickupOrder)
+
 	// user api
 	// api.Use(authHandler.AuthorizationRequired())
 
@@ -147,6 +149,7 @@ func initTimeZone() {
 	}
 
 	time.Local = ict
+	logs.Info("load timezone Asia/Bangkok")
 }
 
 func initApp() *fiber.App {

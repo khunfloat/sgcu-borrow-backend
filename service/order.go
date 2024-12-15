@@ -26,11 +26,11 @@ func NewOrderService(
 	lostRespository modelRepo.LostRepository,
 ) orderService {
 	return orderService{
-		orderRepository: orderRepository,
-		itemRepository:  itemRepository,
+		orderRepository:  orderRepository,
+		itemRepository:   itemRepository,
 		borrowRepository: borrowRepository,
 		returnRepository: returnRepository,
-		lostRespository: lostRespository,
+		lostRespository:  lostRespository,
 	}
 }
 
@@ -119,8 +119,8 @@ func (s orderService) CreateOrder(orderRequest modelServ.NewOrderRequest) (*mode
 		}
 
 		itemResponse := modelServ.ItemInOrderResponse{
-			ID: item.ID,
-			Name: existedItem.Name,
+			ID:     item.ID,
+			Name:   existedItem.Name,
 			Amount: item.Amount,
 			ImgUrl: existedItem.ImgUrl,
 		}
@@ -128,21 +128,22 @@ func (s orderService) CreateOrder(orderRequest modelServ.NewOrderRequest) (*mode
 		itemResponses = append(itemResponses, itemResponse)
 	}
 
-
 	orderResponse := modelServ.OrderResponse{
-		ID: order.ID,
-		UserId: userId,
-		UserOrg: userOrg,
+		ID:             order.ID,
+		UserId:         userId,
+		UserOrg:        userOrg,
 		BorrowDatetime: utils.Time2String(order.BorrowDatetime),
 		ReturnDatetime: utils.Time2String(order.ReturnDatetime),
-		Items: itemResponses,
+		PickupDatetime: utils.Time2String(order.PickupDatetime),
+		DropoffDatetime: utils.Time2String(order.DropoffDatetime),
+		Items:          itemResponses,
 	}
 
 	return &orderResponse, nil
 }
 
 func (s orderService) GetOrders() ([]modelServ.OrderResponse, error) {
-	
+
 	orders, err := s.orderRepository.GetAll()
 	if err != nil {
 		logs.Error(err)
@@ -151,9 +152,8 @@ func (s orderService) GetOrders() ([]modelServ.OrderResponse, error) {
 
 	orderResponses := []modelServ.OrderResponse{}
 
-
 	for _, order := range orders {
-	
+
 		orderId := order.ID
 		userId := order.UserId
 		userOrg := order.UserOrg
@@ -167,7 +167,7 @@ func (s orderService) GetOrders() ([]modelServ.OrderResponse, error) {
 			logs.Error(err)
 			return nil, errs.NewUnexpectedError()
 		}
-		
+
 		itemResponses := []modelServ.ItemInOrderResponse{}
 
 		for _, item := range items {
@@ -178,8 +178,8 @@ func (s orderService) GetOrders() ([]modelServ.OrderResponse, error) {
 			}
 
 			itemResponse := modelServ.ItemInOrderResponse{
-				ID: borrowedItem.ID,
-				Name: borrowedItem.Name,
+				ID:     borrowedItem.ID,
+				Name:   borrowedItem.Name,
 				Amount: item.Amount,
 				ImgUrl: borrowedItem.ImgUrl,
 			}
@@ -188,19 +188,19 @@ func (s orderService) GetOrders() ([]modelServ.OrderResponse, error) {
 		}
 
 		orderResponse := modelServ.OrderResponse{
-			ID: orderId,
-			UserId: userId,
-			UserOrg: userOrg,
-			BorrowDatetime: utils.Time2String(borrowDatetime),
-			ReturnDatetime: utils.Time2String(returnDatetime),
-			PickupDatetime: utils.Time2String(pickupDatetime),
+			ID:              orderId,
+			UserId:          userId,
+			UserOrg:         userOrg,
+			BorrowDatetime:  utils.Time2String(borrowDatetime),
+			ReturnDatetime:  utils.Time2String(returnDatetime),
+			PickupDatetime:  utils.Time2String(pickupDatetime),
 			DropoffDatetime: utils.Time2String(dropoffDatetime),
-			Items: itemResponses,
+			Items:           itemResponses,
 		}
 
 		orderResponses = append(orderResponses, orderResponse)
 	}
-	
+
 	return orderResponses, nil
 }
 
@@ -228,8 +228,8 @@ func (s orderService) GetOrder(id int) (*modelServ.OrderResponse, error) {
 		}
 
 		itemResponse := modelServ.ItemInOrderResponse{
-			ID: item.ItemId,
-			Name: existedItem.Name,
+			ID:     item.ItemId,
+			Name:   existedItem.Name,
 			Amount: item.Amount,
 			ImgUrl: existedItem.ImgUrl,
 		}
@@ -237,19 +237,20 @@ func (s orderService) GetOrder(id int) (*modelServ.OrderResponse, error) {
 		itemResponses = append(itemResponses, itemResponse)
 	}
 
-
 	orderResponse := modelServ.OrderResponse{
-		ID: order.ID,
-		UserId: order.UserId,
-		UserOrg: order.UserOrg,
+		ID:             order.ID,
+		UserId:         order.UserId,
+		UserOrg:        order.UserOrg,
 		BorrowDatetime: utils.Time2String(order.BorrowDatetime),
 		ReturnDatetime: utils.Time2String(order.ReturnDatetime),
-		Items: itemResponses,
+		PickupDatetime: utils.Time2String(order.PickupDatetime),
+		DropoffDatetime: utils.Time2String(order.DropoffDatetime),
+		Items:          itemResponses,
 	}
 
 	return &orderResponse, nil
 }
-	
+
 func (s orderService) UpdateOrder(orderRequest modelServ.UpdateOrderRequest) (*modelServ.OrderResponse, error) {
 	id := orderRequest.ID
 	userId := orderRequest.UserId
@@ -298,7 +299,7 @@ func (s orderService) UpdateOrder(orderRequest modelServ.UpdateOrderRequest) (*m
 		logs.Error(err)
 		return nil, errs.NewUnexpectedError()
 	}
-	
+
 	// 2. create borrow
 	itemResponses := []modelServ.ItemInOrderResponse{}
 
@@ -321,7 +322,7 @@ func (s orderService) UpdateOrder(orderRequest modelServ.UpdateOrderRequest) (*m
 		}
 
 		// check item amount
-		if existedItem.CurrentAmount + currentBorrow.Amount < amount {
+		if existedItem.CurrentAmount+currentBorrow.Amount < amount {
 			logs.Error(err)
 			return nil, errs.NewBadRequestError("item amount is not enough")
 		}
@@ -343,8 +344,8 @@ func (s orderService) UpdateOrder(orderRequest modelServ.UpdateOrderRequest) (*m
 		}
 
 		itemResponse := modelServ.ItemInOrderResponse{
-			ID: item.ID,
-			Name: existedItem.Name,
+			ID:     item.ID,
+			Name:   existedItem.Name,
 			Amount: item.Amount,
 			ImgUrl: existedItem.ImgUrl,
 		}
@@ -353,12 +354,14 @@ func (s orderService) UpdateOrder(orderRequest modelServ.UpdateOrderRequest) (*m
 	}
 
 	orderResponse := modelServ.OrderResponse{
-		ID: order.ID,
-		UserId: userId,
-		UserOrg: userOrg,
+		ID:             order.ID,
+		UserId:         userId,
+		UserOrg:        userOrg,
 		BorrowDatetime: utils.Time2String(order.BorrowDatetime),
 		ReturnDatetime: utils.Time2String(order.ReturnDatetime),
-		Items: itemResponses,
+		PickupDatetime: utils.Time2String(order.PickupDatetime),
+		DropoffDatetime: utils.Time2String(order.DropoffDatetime),
+		Items:          itemResponses,
 	}
 
 	return &orderResponse, nil
@@ -410,9 +413,100 @@ func (s orderService) DeleteOrder(id int) error {
 	return nil
 }
 
-func (s orderService) PickupOrder(modelServ.CheckOrderRequest) (*modelServ.OrderResponse, error) {
-	return nil, nil
+func (s orderService) PickupOrder(orderRequest modelServ.CheckOrderRequest) (*modelServ.OrderResponse, error) {
+
+	id := orderRequest.ID
+	items := orderRequest.Items
+
+	order, err := s.orderRepository.GetById(id)
+	if err != nil {
+		logs.Error(err)
+		return nil, errs.NewBadRequestError("order not found")
+	}
+
+	if (order.PickupDatetime != time.Time{}) {
+		logs.Error(err)
+		return nil, errs.NewBadRequestError("order has been picked up")
+	}
+
+	var itemResponses []modelServ.ItemInOrderResponse
+
+	for _, item := range items {
+		itemId := item.ID
+		pickupAmount := item.Amount
+
+		// get current borrow
+		currentBorrow, err := s.borrowRepository.GetByOrderIdAndItemId(id, itemId)
+		if err != nil {
+			logs.Error(err)
+			return nil, errs.NewBadRequestError("Item doesn't in this order")
+		}
+
+		// get item data
+		itemInfo, err := s.itemRepository.GetById(itemId)
+		if err != nil {
+			logs.Error(err)
+			return nil, errs.NewBadRequestError("item not found")
+		}
+
+		// if number of pickup item is not equal to number of borrow item
+		if currentBorrow.Amount != pickupAmount {
+
+			// check item amount
+			if itemInfo.CurrentAmount+currentBorrow.Amount < pickupAmount {
+				logs.Error(err)
+				return nil, errs.NewBadRequestError("item amount is not enough")
+			}
+
+			// update borrow item
+			_, err = s.borrowRepository.Update(currentBorrow.ID, order.ID, itemId, pickupAmount)
+			if err != nil {
+				logs.Error(err)
+				return nil, errs.NewUnexpectedError()
+			}
+
+			// update item amount
+			newCurrentAmount := itemInfo.CurrentAmount + currentBorrow.Amount - pickupAmount
+
+			_, err = s.itemRepository.Update(itemId, itemInfo.Name, newCurrentAmount, itemInfo.ImgUrl, itemInfo.BorrowCount)
+			if err != nil {
+				logs.Error(err)
+				return nil, errs.NewUnexpectedError()
+			}
+		}
+
+		itemResponse := modelServ.ItemInOrderResponse{
+			ID:     item.ID,
+			Name:   itemInfo.Name,
+			Amount: pickupAmount,
+			ImgUrl: itemInfo.ImgUrl,
+		}
+
+		itemResponses = append(itemResponses, itemResponse)
+	}
+
+	pickupTime := utils.DatetimeNow()
+
+	_, err = s.orderRepository.UpdatePickupDatetime(order.ID, pickupTime)
+	if err != nil {
+		logs.Error(err)
+		return nil, errs.NewUnexpectedError()
+	}
+
+	orderResponse := modelServ.OrderResponse{
+		ID:         order.ID,
+		UserId: 	order.UserId,
+		UserOrg:	order.UserOrg,
+		BorrowDatetime: utils.Time2String(order.BorrowDatetime),
+		ReturnDatetime: utils.Time2String(order.ReturnDatetime),
+		PickupDatetime: utils.Time2String(pickupTime),
+		DropoffDatetime: utils.Time2String(order.DropoffDatetime),
+		Items:      itemResponses,
+	}
+
+	return &orderResponse, nil
 }
+
 func (s orderService) DropoffOrder(modelServ.CheckOrderRequest) (*modelServ.OrderResponse, error) {
 	return nil, nil
 }
